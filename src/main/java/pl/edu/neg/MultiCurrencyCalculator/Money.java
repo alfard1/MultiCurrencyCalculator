@@ -1,43 +1,52 @@
 package pl.edu.neg.MultiCurrencyCalculator;
 
-public abstract class Money {
+public class Money implements Expression {
 
     protected int amount;
-    public String currencyId;
-    public double exchangeToPLN;
+    public String currency;
+    //public double exchangeToPLN;
 
-    public Money() {
-    }
-
-    public Money(int amount) {
+    public Money(int amount, String currency) {
         this.amount = amount;
+        this.currency = currency;
     }
 
-    public Money(int amount, String currencyId, double exchange) {
-        this.amount = amount;
-        this.currencyId = currencyId;
-        this.exchangeToPLN = exchange;
+    protected String currency() {
+        return currency;
     }
 
-    int times(int multiplier){
-        return this.amount *= multiplier;
+    public static Money dollar(int amount){
+        return new Money(amount, "USD");
+    }
+
+    public static Money franc(int amount){
+        return new Money(amount, "CHF");
     }
 
     public boolean equals(Object object) {
-        Money tempMoney = (Money) object;
-        // return this.amount == tempMoney.amount && getClass() == object.getClass();
-        return this.amount == tempMoney.amount
-                && this.currencyId == tempMoney.currencyId
-                && this.exchangeToPLN == tempMoney.exchangeToPLN
-                && getClass().equals(object.getClass());
+        Money money = (Money) object;
+        return amount == money.amount
+                && this.currency == money.currency;
+    }
+
+    @Override
+    public Money reduce(String to) {
+        return this;
     }
 
     @Override
     public String toString() {
         return "Money{" +
                 "amount=" + amount +
-                ", currencyId='" + currencyId + '\'' +
-                ", exchangeToPLN=" + exchangeToPLN +
+                ", currency='" + currency + '\'' +
                 '}';
+    }
+
+    public Money times(int multiplier){
+        return new Money(this.amount *= multiplier, this.currency);
+    }
+
+    public Expression plus(Money addend) {
+        return new Sum(this, addend);
     }
 }
